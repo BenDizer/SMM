@@ -1,0 +1,10 @@
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\bin\Debug\stellaris mod manager.exe.config
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\bin\Debug\stellaris mod manager.exe
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\bin\Debug\stellaris mod manager.pdb
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris mod manager.csprojAssemblyReference.cache
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris_mod_manager.Form1.resources
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris_mod_manager.Properties.Resources.resources
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris mod manager.csproj.GenerateResource.cache
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris mod manager.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris mod manager.exe
+C:\Users\Administrator\source\repos\stellaris mod manager\stellaris mod manager\obj\Debug\stellaris mod manager.pdb
