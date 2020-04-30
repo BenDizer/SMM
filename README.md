@@ -1,5 +1,5 @@
 # SMM
-Этот проект изначально задумывался как простенький скрипт который позволит быстро устанавливать моды на Stellaris без Steam или Paradox, но как это часто бывает, я решил не останавливаться на обычной установке. В итоге получился универсальный инструмент для  работы с модами включающий такие вещи, как установка модов из Steam Workshop без лаунчера и акаунта Steam, машинный перевод модов на другие языки.     This project was originally conceived as a simple script that will allow you to quickly install fashion on Stellaris without Steam or Paradox, but as it often happens, I decided not to stop at the usual installation. As a result, it turned out to be a universal tool for working with mods including such things as setting mods from Steam Workshop without a launcher and acaunt Steam, machine translation of mods into other languages.
+Этот проект изначально задумывался как простенький скрипт который позволит быстро устанавливать моды на Stellaris без Steam или Paradox, но как это часто бывает, я решил не останавливаться на обычной установке. В итоге получился универсальный инструмент для  работы с модами включающий такие вещи, как установка модов из Steam Workshop без лаунчера и акаунта Steam, машинный перевод модов на другие языки.     
 
 Инструкция:
  - Установка модов
@@ -21,6 +21,9 @@
  Поддержать разработчика 
    https://money.yandex.ru/to/4100111162649080
    
+   
+This project was originally conceived as a simple script that will allow you to quickly install fashion on Stellaris without Steam or Paradox, but as it often happens, I decided not to stop at the usual installation. As a result, it turned out to be a universal tool for working with mods including such things as setting mods from Steam Workshop without a launcher and acaunt Steam, machine translation of mods into other languages.
+
  Instruction.
  - Installation of spendthrifts
   1 Starting the program
