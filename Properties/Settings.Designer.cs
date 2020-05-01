@@ -58,5 +58,17 @@ namespace stellaris_mod_manager.Properties {
                 this["Key"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Folder_Doc {
+            get {
+                return ((string)(this["Folder_Doc"]));
+            }
+            set {
+                this["Folder_Doc"] = value;
+            }
+        }
     }
 }

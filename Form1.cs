@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Translator;
+using System.Linq;
 
 
 namespace stellaris_mod_manager
@@ -15,15 +16,17 @@ namespace stellaris_mod_manager
     public partial class Form1 : Form
     {
         public static string name_file, name_fileM, url1, name1, path1, lang;
-        public static bool wait = false;
+        public static bool wait, wait1 = false;
         public static string[] filer, Papka, Papfl = new string[0];
         public static int raz;
         YandexTranslator yt;
+        Random rnd = new Random();
         public Form1()
         {
             InitializeComponent();
             webBrowser1.ScriptErrorsSuppressed = true;
             webBrowser1.Navigate("http://steamworkshop.download");
+            pause1();
             label3.Text = "Версия программы: " + Properties.Settings.Default.Version;
             if (Properties.Settings.Default.Folder == "")
             {
@@ -39,43 +42,54 @@ namespace stellaris_mod_manager
             button1.Enabled = false;
             button2.Enabled = false;
             button3.Enabled = false;
+            button4.Enabled = false;
             pictureBox1.Enabled = false;
             progressBar1.Maximum = 100;
             name_file = null;
-            label3.Text = "Запущен";
+            textBox1.AppendText("Запущен" + Environment.NewLine);
             backgroundWorker1.RunWorkerAsync();
 
         }
 
         private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
+                if (backgroundWorker1.CancellationPending == true) { return; }
+
+
             backgroundWorker1.ReportProgress(10, "Start");
             Thread.Sleep(2000);
+            if (backgroundWorker1.CancellationPending == true) { return; }
             backgroundWorker1.ReportProgress(30);
             Thread.Sleep(4000);
+            if (backgroundWorker1.CancellationPending == true) { return; }
             backgroundWorker1.ReportProgress(50);
 
             while (wait != true)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(200);
+                if (backgroundWorker1.CancellationPending == true) { return; }
             }
             wait = false;
             Thread.Sleep(2000);
+            if (backgroundWorker1.CancellationPending == true) { return; }
             backgroundWorker1.ReportProgress(80);
-            while (wait != true)
+            while (wait1 != true)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(200);
+                if (backgroundWorker1.CancellationPending == true) { return; }
             }
             wait = false;
+            Thread.Sleep(4000);
             backgroundWorker1.ReportProgress(90);
             Thread.Sleep(2000);
+            if (backgroundWorker1.CancellationPending == true) { return; }
             backgroundWorker1.ReportProgress(100);
         }
         public void Start_Search()
         {
             if (Properties.Settings.Default.Folder != null && textBox2.Text != null)
             {
-                label3.Text = "Веду поиск";
+                textBox1.AppendText("Веду поиск" + Environment.NewLine);
                 HtmlDocument doc = webBrowser1.Document;
                 HtmlElement workshop = doc.GetElementById("workshop");
                 HtmlElementCollection cjlection = workshop.GetElementsByTagName("input");
@@ -90,7 +104,7 @@ namespace stellaris_mod_manager
             else
             {
                 backgroundWorker1.CancelAsync();
-                label3.Text = "Ошибка! Заполните поля!";
+                textBox1.AppendText("Ошибка! Заполните поля!" + Environment.NewLine);
             }
         }
 
@@ -108,12 +122,18 @@ namespace stellaris_mod_manager
                         int pos = f.InnerText.LastIndexOf('.');
                         name_file = f.InnerText.Substring(0, pos);
                         DownloadFile(f.GetAttribute("href"), Properties.Settings.Default.Folder, f.InnerText, name_file);
+                        textBox1.AppendText("Скачиваю" + Environment.NewLine);
                     }
-                label3.Text = "Скачиваю";
+                    else
+                    {
+                        textBox1.AppendText("Ошибка! Не могу получить ссылку! :(" + Environment.NewLine);
+                        backgroundWorker1.CancelAsync();
+                    }
+                
             }
             catch
             {
-                label3.Text = "Ошибка! Этот файл нельзя скачать :(";
+                textBox1.AppendText("Ошибка! Этот файл нельзя скачать :(" + Environment.NewLine);
                 backgroundWorker1.CancelAsync();
             }
         }
@@ -124,11 +144,11 @@ namespace stellaris_mod_manager
                 HtmlDocument doc = webBrowser1.Document;
                 HtmlElement dwlk = doc.GetElementById("steamdownload");
                 dwlk.InvokeMember("click");
-                label3.Text = "Получаю ссылку";
+                textBox1.AppendText("Получаю ссылку" + Environment.NewLine);
             }
             catch
             {
-                label3.Text = "Ошибка! Такого файла нет :(";
+                textBox1.AppendText("Ошибка! Такого файла нет :(" + Environment.NewLine);
                 backgroundWorker1.CancelAsync();
             }
         }
@@ -136,7 +156,7 @@ namespace stellaris_mod_manager
         {
             try
             {
-                label3.Text = "Создаю .mod";
+                textBox1.AppendText("Создаю .mod" + Environment.NewLine);
                 using (FileStream fs = File.Create(path))
                 {
                     byte[] info = new UTF8Encoding(true).GetBytes("name=\"" + name_fileM + "\"");
@@ -151,13 +171,14 @@ namespace stellaris_mod_manager
                     sw.WriteLine("supported_version=\"2.6.*\"");
                     sw.WriteLine("path=\"" + Properties.Settings.Default.Folder + @"\" + name_fileM + "\"");
                     sw.WriteLine("remote_file_id=\"" + name_file + "\"");
+                    sw.Close();
                 }
-                label3.Text = "Успешно!";
+                textBox1.AppendText("Успешно!" + Environment.NewLine);
             }
             catch
             {
                 File.Delete(path);
-                label3.Text = "Создаю .mod";
+                textBox1.AppendText("Создаю .mod" + Environment.NewLine);
                 using (FileStream fs = File.Create(path))
                 {
                     byte[] info = new UTF8Encoding(true).GetBytes("name=\"" + name_fileM + "\"");
@@ -172,16 +193,16 @@ namespace stellaris_mod_manager
                     sw.WriteLine("supported_version=\"2.6.*\"");
                     sw.WriteLine("path=\"" + Properties.Settings.Default.Folder + @"\" + name_fileM + "\"");
                     sw.WriteLine("remote_file_id=\"" + name_file + "\"");
+                    sw.Close();
                 }
-                label3.Text = "Успешно!";
+                textBox1.AppendText("Успешно!" + Environment.NewLine);
             }
-
         }
         public void DLT()
         {
-            label3.Text = "Удаляю временные файлы";
-            Directory.Delete(Properties.Settings.Default.Folder + @"\Temp", true);
-            label3.Text = "Файл " + name_fileM + " успешно скачан!";
+            textBox1.AppendText("Удаляю временные файлы" + Environment.NewLine);
+            try { Directory.Delete(Properties.Settings.Default.Folder + @"\Temp", true); } catch { }
+            textBox1.AppendText("Файл " + name_fileM + " успешно скачан!" + Environment.NewLine);
         }
 
         private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -221,10 +242,7 @@ namespace stellaris_mod_manager
                 pictureBox1.Enabled = true;
             }
         }
-        public static void MyMethod()
-        {
 
-        }
         public void DownloadFile(string url, string path, string name, string name_file)
         {
             Directory.CreateDirectory(path + @"\Temp");
@@ -270,14 +288,40 @@ namespace stellaris_mod_manager
 
         private void WebClient1_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            label3.Text = "Файл успешно скачан! Перехожу к распаковке";
+            textBox1.AppendText("Файл успешно скачан! Перехожу к распаковке" + Environment.NewLine);
             ZipS(path1 + @"\Temp\" + name1, path1, name_file);
         }
 
         private void WebClient1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-
-            label4.Text = (string)e.UserState + "    downloaded " + e.BytesReceived + " of " + e.TotalBytesToReceive + " bytes. " + e.ProgressPercentage + " % complete...";
+            double mbt = Convert.ToInt32(e.TotalBytesToReceive);
+            string b = " бит";
+            int del = 1;
+            if (mbt / 8 > 1)
+            {
+                mbt = mbt / 8;
+                b = " байт";
+                del = 8;
+                if (mbt / 1024 > 1)
+                {
+                    mbt = mbt / 1024;
+                    b = " Кбайт";
+                    del = 8192;
+                    if (mbt / 1024 > 1)
+                    {
+                        mbt = mbt / 1024;
+                        b = " Мбайт";
+                        del = 8388608;
+                    }
+                }
+            }
+            mbt = Math.Round(mbt, 2);
+            double mb = Convert.ToInt32(e.BytesReceived);
+            mb = Math.Round(mb / del, 2);
+            var lines = textBox1.Lines.ToList();
+            lines.RemoveAt(lines.Count - 2);
+            textBox1.Lines = lines.ToArray();
+            textBox1.AppendText((string)e.UserState + " Скачано " + mb + " из " + mbt + b + e.ProgressPercentage + " % ..." + Environment.NewLine);
         }
 
         private void Button3_Click(object sender, EventArgs e)
@@ -292,10 +336,21 @@ namespace stellaris_mod_manager
                 button1.Enabled = false;
                 button2.Enabled = false;
                 button3.Enabled = false;
+                button4.Enabled = false;
                 pictureBox1.Enabled = false;
-                Thread MyThread1 = new Thread(delegate () { poisk_papka(Properties.Settings.Default.Folder + @"\" + textBox2.Text); });
-                MyThread1.Start();
-
+                folderBrowserDialog1.ShowDialog();
+                if (folderBrowserDialog1.SelectedPath != "")
+                {
+                    Thread MyThread1 = new Thread(delegate () { poisk_papka(folderBrowserDialog1.SelectedPath); });
+                    MyThread1.Start();
+                }
+                else { textBox1.AppendText("Папка с модом не выбрана!" + Environment.NewLine);
+                    button1.Enabled = true;
+                    button2.Enabled = true;
+                    button3.Enabled = true;
+                    button4.Enabled = true;
+                    pictureBox1.Enabled = true;
+                }
 
             }
         }
@@ -305,7 +360,7 @@ namespace stellaris_mod_manager
             int i = 0;
             using (StreamReader sr = new StreamReader(path2 + @"\" + name_file1, System.Text.Encoding.UTF8))
             {
-                label3.Invoke(new Action(() => { label3.Text = "Перевожу " + name_file1; }));
+                label3.Invoke(new Action(() => { textBox1.AppendText("Перевожу " + name_file1 + Environment.NewLine); }));
                 string line;
                 Array.Resize(ref filer, 0);
                 while ((line = sr.ReadLine()) != null)
@@ -313,7 +368,8 @@ namespace stellaris_mod_manager
                     Array.Resize(ref filer, filer.Length + 1);
                     filer[i] = line;
                     i++;
-                    label4.Invoke(new Action(() => { label4.Text = "Читаю строчку №" + i; }));
+                    textBox1.Invoke(new Action(() => { textBox1.AppendText("Читаю строчку №" + i + Environment.NewLine); }));
+                    //label4.Invoke(new Action(() => { label4.Text = "Читаю строчку №" + i; }));
                 }
                 raz = i;
                 sr.Close();
@@ -396,12 +452,15 @@ namespace stellaris_mod_manager
                         progressBar1.Invoke(new Action(() => { progressBar1.Value = i; }));
 
                     }
-                    label3.Invoke(new Action(() => { label3.Text = "Все переведено!"; }));
-                    progressBar1.Invoke(new Action(() => { progressBar1.Value = 0; }));
-                    button1.Enabled = true;
-                    button2.Enabled = true;
-                    button3.Enabled = true;
-                    pictureBox1.Enabled = true;
+                    label3.Invoke(new Action(() => { textBox1.AppendText("Все переведено!" + Environment.NewLine); }));
+                    progressBar1.Invoke(new Action(() => { progressBar1.Value = 0;
+                        button1.Enabled = true;
+                        button2.Enabled = true;
+                        button3.Enabled = true;
+                        button4.Enabled = true;
+                        pictureBox1.Enabled = true;
+                    }));
+                    
                 }
                 else
                 {
@@ -411,7 +470,7 @@ namespace stellaris_mod_manager
             else
             {
                 Form1 form1 = new Form1();
-                form1.label3.Text = "Нечего переводить!";
+                form1.textBox1.AppendText("Нечего переводить!" + Environment.NewLine);
             }
         }
         public delegate void InvokeDelegate();
@@ -421,11 +480,7 @@ namespace stellaris_mod_manager
 
         }
 
-        static void poisk_file(string file)
-        {
-
-        }
-        public async void Tran(string path2, string name_file1)
+        public void Tran(string path2, string name_file1)
         {
 
             for (int i = 1; i < raz; i++)
@@ -440,7 +495,8 @@ namespace stellaris_mod_manager
                 catch
                 {
                 }
-                label4.Invoke(new Action(() => { label4.Text = "Перевожу строку №" + i; }));
+                textBox1.Invoke(new Action(() => { textBox1.AppendText("Перевожу строку № " + i + Environment.NewLine); }));
+                //label4.Invoke(new Action(() => { label4.Text = ; }));
             }
             Thread MyThread1 = new Thread(delegate () { WriD(path2, name_file1); });
             MyThread1.Start();
@@ -454,7 +510,12 @@ namespace stellaris_mod_manager
 
         private void Button4_Click(object sender, EventArgs e)
         {
-            folderBrowserDialog1.ShowDialog();
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+            pictureBox1.Enabled = false;
+            backgroundWorker3.RunWorkerAsync();
 
         }
 
@@ -462,9 +523,50 @@ namespace stellaris_mod_manager
         {
             if (e.ProgressPercentage == 10)
             {
-                //ZipS();
+                progressBar1.Value = 10;
+                name_file = System.IO.Path.GetFileNameWithoutExtension(openFileDialog1.FileName);
+                textBox1.AppendText("Открываю" + Environment.NewLine);
+                ZipS1(openFileDialog1.FileName, Properties.Settings.Default.Folder, name_file);
                 progressBar1.Value = 10;
             }
+            if (e.ProgressPercentage == 50)
+            {
+                ReadM(Properties.Settings.Default.Folder + @"\" + name_file);
+                progressBar1.Value = 50;
+            }
+            if (e.ProgressPercentage == 90)
+            {
+                CF(Properties.Settings.Default.Folder + @"\" + name_fileM + ".mod");
+                progressBar1.Value = 100;
+            }
+            if (e.ProgressPercentage == 100)
+            {
+                textBox1.AppendText("Успешно" + Environment.NewLine);
+                progressBar1.Value = 0;
+            }
+        }
+
+        private void BackgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            backgroundWorker2.ReportProgress(10);
+
+            while (wait != true)
+            {
+                Thread.Sleep(100);
+            }
+            wait = false;
+            Thread.Sleep(2000);
+            backgroundWorker2.ReportProgress(50);
+            while (wait1 != true)
+            {
+                Thread.Sleep(100);
+            }
+            wait = false;
+            Thread.Sleep(2000);
+            backgroundWorker2.ReportProgress(90);
+            Thread.Sleep(2000);
+            backgroundWorker2.ReportProgress(100);
+
         }
 
         public async void WriD(string path2, string name_file1)
@@ -480,7 +582,8 @@ namespace stellaris_mod_manager
                 for (int i = 1; i < raz; i++)
                 {
                     sw.WriteLine(filer[i]);
-                    label4.Invoke(new Action(() => { label4.Text = "Записываю строку №" + i; }));
+                    textBox1.Invoke(new Action(() => { textBox1.AppendText("Записываю строку № " + i + Environment.NewLine); }));
+                    //textBox1.Invoke(new Action(() => { label4.Text =  + i; }));
                 }
                 sw.Close();
             }
@@ -492,6 +595,98 @@ namespace stellaris_mod_manager
 
         }
 
+        private void BackgroundWorker3_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string[] nf = new string[0];
+            int i = 0;
+            System.IO.DirectoryInfo info_file = new System.IO.DirectoryInfo(Properties.Settings.Default.Folder);
+            System.IO.FileInfo[] file1 = info_file.GetFiles();
+            foreach (var dir_file in file1)
+            {
+                Array.Resize(ref nf, nf.Length + 1);
+                nf[i] = Path.GetFileNameWithoutExtension(dir_file.FullName);
+                i++;
+            }
+
+            try
+            {
+                File.Delete(Properties.Settings.Default.Folder_Doc + @"\dlc_load.json");
+            }
+            catch
+            { }
+            using (FileStream fs = File.Create(Properties.Settings.Default.Folder_Doc + @"\dlc_load.json"))
+            {
+                //byte[] info = new UTF8Encoding(true).GetBytes("{");
+                //fs.Write(info, 0, info.Length);
+            }
+            string text = "";
+            string ver = "2.6.*";
+            using (StreamWriter sw = File.AppendText(Properties.Settings.Default.Folder_Doc + @"\dlc_load.json"))
+            {
+                sw.WriteLine("{\"enabled_mods\":[");
+                for (i = 0; i < nf.Length; i++)
+                {
+
+                    text = "\"mod/" + nf[i] + "\"";
+                    if (i != nf.Length - 1)
+                    {
+                        text = text + ",";
+                    }
+                    sw.WriteLine(text);
+                    textBox1.Invoke(new Action(() => { textBox1.AppendText(nf[i] + " включен" + Environment.NewLine); }));
+                   
+                }
+                sw.WriteLine("],\"disabled_dlcs\":[]}");
+                sw.Close();
+            }
+        }
+        string GenRandomString(string Alphabet, int Length)
+        {
+            
+            StringBuilder sb = new StringBuilder(Length - 1);
+            int Position = 0;
+
+
+            for (int i = 0; i < Length; i++)
+            {
+                Position = rnd.Next(0, Alphabet.Length - 1);
+                sb.Append(Alphabet[Position]);
+            }
+            string f = sb.ToString();
+            sb.Clear();
+            return f;
+            
+        }
+        private void BackgroundWorker3_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        private void Label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BackgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            button1.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+            button4.Enabled = true;
+            pictureBox1.Enabled = true;
+            progressBar1.Value = 0;
+        }
+
+        private void BackgroundWorker3_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            button1.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+            button4.Enabled = true;
+            pictureBox1.Enabled = true;
+            progressBar1.Value = 0;
+        }
+
         private void PictureBox1_Click(object sender, EventArgs e)
         {
             Form2 form2 = new Form2();
@@ -500,30 +695,41 @@ namespace stellaris_mod_manager
 
         public void StopW(string ms)
         {
-            label3.Text = ms;
+            textBox1.AppendText(ms + Environment.NewLine);
             backgroundWorker1.CancelAsync();
         }
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            name_file = textBox2.Text;
-            name_fileM = name_file;
-            CF(Properties.Settings.Default.Folder + @"\" + name_file + ".mod");
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+            pictureBox1.Enabled = false;
+            openFileDialog1.ShowDialog();
+            textBox1.AppendText("Файл " + openFileDialog1.FileName + " выбран" + Environment.NewLine);
+            backgroundWorker2.RunWorkerAsync();
         }
 
         private void BackgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            button1.Enabled = true;
+            button2.Enabled = true;
+            button3.Enabled = true;
+            button4.Enabled = true;
+            pictureBox1.Enabled = true;
             progressBar1.Value = 0;
         }
         public void ReadM(string path2)
         {
             wait = false;
             int i = 0;
+            
             try
             {
                 using (StreamReader sr = new StreamReader(path2 + @"\descriptor.mod", System.Text.Encoding.UTF8))
                 {
-                    label3.Text = "Узнаю название";
+                    textBox1.AppendText("Узнаю название" + Environment.NewLine);
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -536,18 +742,215 @@ namespace stellaris_mod_manager
                             break;
                         }
                         i++;
-                        label4.Text = "Читаю строчку №" + i;
+                        textBox1.Invoke(new Action(() => { textBox1.AppendText("Записываю строку № " + i + Environment.NewLine); }));
+                        //label4.Text = "Читаю строчку №" + i;
                     }
                     sr.Close();
                 }
             }
             catch
             {
-                name_fileM = name_file;
-            }
-            Directory.Move(path2, Properties.Settings.Default.Folder + @"\" + name_fileM);
-            wait = true;
+                try
+                {
+                    System.IO.DirectoryInfo info_file = new System.IO.DirectoryInfo(path2);
+                    System.IO.FileInfo[] file1 = info_file.GetFiles();
+                    foreach (var dir_file in file1)
+                    {
+                       
+                        try
+                        {
+                            ZipFile.ExtractToDirectory(dir_file.FullName, path2);
+                        }
+                        catch
+                        {}
+                        File.Delete(dir_file.FullName);
+                    }
+                    try
+                    {
+                        using (StreamReader sr = new StreamReader(path2 + @"\descriptor.mod", System.Text.Encoding.UTF8))
+                        {
+                            textBox1.AppendText("Узнаю название" + Environment.NewLine);
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                string[] words = line.Split(new char[] { '=' });
+                                string first = words[0];
+                                if (first == "name")
+                                {
+                                    string[] words1 = line.Split(new char[] { '"' });
+                                    name_fileM = words1[1];
+                                    break;
+                                }
+                                i++;
+                                textBox1.AppendText("Читаю строчку №" + i + Environment.NewLine);
+                                //label4.Text = "Читаю строчку №" + i;
+                            }
+                            sr.Close();
+                            if (name_fileM == null)
+                            {
+                                File.Delete(path2 + @"\descriptor.mod");
+                                try
+                                {
+                                    Directory.Delete(Properties.Settings.Default.Folder + @"\Temp", true);
+                                }
+                                catch
+                                { }
+                                try
+                                {
+                                    Directory.CreateDirectory(Properties.Settings.Default.Folder + @"\Temp");
+                                    ZipFile.ExtractToDirectory(openFileDialog1.FileName, Properties.Settings.Default.Folder + @"\Temp");
 
+                                }
+                                catch
+                                {}
+                                try
+                                {
+                                    System.IO.DirectoryInfo info_file1 = new System.IO.DirectoryInfo(Properties.Settings.Default.Folder + @"\Temp");
+                                    System.IO.FileInfo[] file2 = info_file1.GetFiles();
+                                    foreach (var dir_file1 in file2)
+                                    {
+
+                                        try
+                                        {
+                                            if (Path.GetExtension(dir_file1.Name) == ".mod")
+                                            {
+                                                File.Move(dir_file1.FullName, path2 + @"\descriptor.mod");
+                                            }
+                                        }
+                                        catch
+                                        { }
+                                    }
+                                }
+                                catch
+                                { }
+                                try
+                                {
+                                    Directory.Delete(Properties.Settings.Default.Folder + @"\Temp", true);
+                                }
+                                catch
+                                { }
+                                
+                                try
+                                {
+                                    using (StreamReader sr1 = new StreamReader(path2 + @"\descriptor.mod", System.Text.Encoding.UTF8))
+                                    {
+                                        textBox1.AppendText("Узнаю название" + Environment.NewLine);
+                                        
+                                        while ((line = sr1.ReadLine()) != null)
+                                        {
+                                            string[] words = line.Split(new char[] { '=' });
+                                            string first = words[0];
+                                            if (first == "name")
+                                            {
+                                                string[] words1 = line.Split(new char[] { '"' });
+                                                name_fileM = words1[1];
+                                                break;
+                                            }
+                                            i++;
+                                            textBox1.AppendText("Читаю строчку №" + i + Environment.NewLine);
+                                            //label4.Text = "Читаю строчку №" + i;
+                                        }
+                                        sr1.Close();
+                                    }
+                                }
+                                catch
+                                {}
+
+                                if (name_fileM == null)
+                                {
+                                    name_fileM = name_file;
+                                    CF(path2 + @"\descriptor.mod");
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        
+                    }
+                }
+                catch { }
+                
+                
+            }
+            try { Directory.Delete(Properties.Settings.Default.Folder + @"\" + name_fileM); }catch { }
+            try {
+            string patha = Properties.Settings.Default.Folder + @"\" + name_fileM;
+                Directory.Move(path2, patha);}catch{ name_fileM = name_file;
+                string patha = Properties.Settings.Default.Folder + @"\" + name_fileM;
+                try { Directory.Move(path2, patha); } catch { }
+            }
+            wait1 = true;
+
+        }
+        public static async void ZipS1(string path_name, string path, string name_file)
+        {
+            await Task.Run(() => Zip1(path_name, path, name_file));
+        }
+       
+        public static void Zip1(string zipPath, string extractPath, string name_file)
+        {
+            try
+            {
+                Directory.Delete(extractPath + @"\Temp", true);
+            }
+            catch
+            {}
+            try
+            {
+                
+                Directory.CreateDirectory(extractPath + @"\Temp");
+                ZipFile.ExtractToDirectory(zipPath, extractPath + @"\Temp");
+                
+            }
+            catch
+            {
+                Form1 form1 = new Form1();
+                form1.StopW("Не удалось открыть zip");
+            }
+            try
+            {
+                    System.IO.DirectoryInfo info_papka = new System.IO.DirectoryInfo(extractPath + @"\Temp");
+                    System.IO.DirectoryInfo[] papka1 = info_papka.GetDirectories();
+
+                    foreach (var dir_papka in papka1)
+                    {
+                        try
+                        {
+                            Directory.Move(dir_papka.FullName, extractPath + @"/" + dir_papka.Name);
+                        }
+                        catch
+                        {
+                            Directory.Delete(extractPath + @"/" + dir_papka.Name);
+                            Directory.Move(dir_papka.FullName, extractPath + @"/" + dir_papka.Name);
+                        }
+                    Form1.name_file = dir_papka.Name;
+                    }
+                    
+                     wait = true;
+            }
+            catch
+            {}
+            try
+            {
+                Directory.Delete(extractPath + @"\Temp", true);
+            }
+            catch
+            {}
+        }
+
+        public static void Zip2(string zipPath, string extractPath, string name_file, string path2)
+        {
+            
+        }
+
+        public void pause1()
+        {
+            while (webBrowser1.ReadyState != WebBrowserReadyState.Complete)
+            {
+                Application.DoEvents();
+
+            }
         }
     }
 }
