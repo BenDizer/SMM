@@ -247,6 +247,11 @@ namespace stellaris_mod_manager
         {
             Directory.CreateDirectory(path + @"\Temp");
             url1 = url;
+            if (url == "")
+            {
+                textBox1.AppendText("Ошибка! Не могу получить ссылку! :(" + Environment.NewLine);
+                backgroundWorker1.CancelAsync();
+            }
             name1 = name;
             path1 = path;
 
@@ -627,7 +632,7 @@ namespace stellaris_mod_manager
                 for (i = 0; i < nf.Length; i++)
                 {
 
-                    text = "\"mod/" + nf[i] + "\"";
+                    text = "\"mod/" + nf[i] + ".mod\"";
                     if (i != nf.Length - 1)
                     {
                         text = text + ",";

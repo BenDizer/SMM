@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="Version" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0.3</Value>
+      <Value Profile="(Default)">0.6</Value>
     </Setting>
     <Setting Name="Folder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
